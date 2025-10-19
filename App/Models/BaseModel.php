@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Models;
+abstract class BaseModel
+{
+    protected $pdo;
+
+    public function __construct()
+    {
+        $this->pdo = DB::getConnection();
+    }
+
+    // every new class has to define name of table
+    abstract function getTable();
+
+    /**
+     * Font one based on id.
+     * @param $id
+     * @return mixed
+     */
+    public function findOne($id, $table = null)
+    {
+        if(is_null($table)) {
+            $table = $this->getTable();
+        }
+
+        $query = $this->pdo->prepare("SELECT * FROM " . $table . " WHERE id = " . $id . " LIMIT 1");
+        $query->execute();
+        return $query->fetch();
+    }
+
+    /**
+     * Find specific row(s) based on param and its value
+     * @param $paramName
+     * @param $paramValue
+     * @param $limit
+     * @param bool $deletedInclude
+     * @return mixed
+     * @throws \Exception
+     */
+    public function findByParam($paramName, $paramValue, $limit = 1, $deletedInclude = false)
+    {
+        try {
+            $limitLabel = $limit !== -1 ? ' LIMIT ' . $limit : '';
+            $deletedIncludeLabel = $deletedInclude === false ? ' and deleted_at IS NULL' : ' and deleted_at IS NOT NULL ';
+
+            $queryLabel = "SELECT * FROM " . $this->getTable() . " WHERE " . $paramName . " = '" . $paramValue . "'" . $deletedIncludeLabel . " ORDER BY created_at DESC " . $limitLabel;
+            $query = $this->pdo->prepare($queryLabel);
+
+            $query->execute();
+        } catch (\PDOException $e) {
+            throw new \Exception("FindByParam made problem: " . $queryLabel . " // " . $e->getMessage());
+        }
+
+        if($limit === 1) {
+            return $query->fetch();
+        } else {
+            return $query->fetchAll();
+        }
+
+    }
+
+    /**
+     * Find all rows by date of creating
+     * @return array
+     */
+    public function all()
+    {
+        $query = $this->pdo->query("SELECT * FROM " . $this->getTable() . " WHERE deleted_at IS NULL ORDER BY created_at DESC");
+        return $query->fetchAll();
+    }
+
+    /**
+     * This is "soft" delete. So we set time of deleting.
+     * If it is allowed to be deleted then we can delete it without problem
+     * @param $id
+     * @param bool $force in case to force delete without checking
+     * @return bool
+     * @throws \Exception
+     */
+    public function delete($id, $force = false)
+    {
+        try {
+
+            if ($force || $this->allowDeleting($id)) {
+                // total delete
+                $query = $this->pdo->prepare("DELETE FROM " . $this->getTable() . " WHERE id = :id");
+            } else {
+                // soft delete
+                $query = $this->pdo->prepare("UPDATE " . $this->getTable() . " SET deleted_at = NOW() WHERE id = :id");
+            }
+
+            if (!$query->execute(['id' => $id])) {
+                throw new \Exception("Error deleting row id: " . $id . " in table:  " . $this->getTable());
+            };
+
+            // each model can create additionally things for DB
+            if(!$this->customThingsToBeDone()) {
+                throw new \Exception("Error with custom thing which need to be deleted, row id: " . $id . " in table:  " . $this->getTable());
+            }
+
+
+        } catch (\PDOException $e) {
+            // todo we can put in log or we just send. It is valid that $id doesn't exist
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * This is different for each model. In case that some data is used in other tables, we will probably just soft delete.
+     * @param $id
+     * @return bool
+     */
+    protected function allowDeleting($id)
+    {
+        return true;
+    }
+
+    /**
+     * This function is used to do additionally queries if it is important like deleting some customer details like phone or something other
+     * In practice, probably due the private and terms we have to delete everything about customer except id
+     * @return bool
+     */
+    protected function customThingsToBeDone() {
+        return true; // empty by default
+    }
+
+}
+
