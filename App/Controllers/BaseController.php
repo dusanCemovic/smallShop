@@ -11,7 +11,7 @@ abstract class BaseController
      * @return void
      * @throws \Exception
      */
-    protected function render($viewPath, $params = [])
+    protected function render($viewPath, $params = []) : void
     {
         extract($params, EXTR_SKIP); // make sure not to overwrite parameters that are already set
 
@@ -23,7 +23,7 @@ abstract class BaseController
         include __DIR__ . '/../Views/layout.php';
     }
 
-    protected function redirect($url)
+    protected function redirect($url) : void
     {
         header('Location: ' . $url);
         exit;
@@ -34,7 +34,7 @@ abstract class BaseController
      * @param $message
      * @return void
      */
-    protected function logError($message) {
+    protected function logError($message) : void {
         // this can be added into log file
         // print $message;
         // exit();

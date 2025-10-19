@@ -4,17 +4,17 @@ namespace App\Models;
 class Subscription extends BaseModel
 {
 
-    function getTable()
+    function getTable() : string
     {
         return 'subscription_packages';
     }
 
     /**
      * Creating new Subscription
-     * @param $data
-     * @return false|string
+     * @param array $data
+     * @return int
      */
-    public function create($data)
+    public function create(array $data) : int
     {
         $query = $this->pdo->prepare("INSERT INTO " . $this->getTable() . " (name, description, price, includes_physical_magazine) VALUES (:name, :description, :price, :includes_physical_magazine)");
         $query->execute([
@@ -29,10 +29,10 @@ class Subscription extends BaseModel
     /**
      * This is custom method for this class. Checking if we can delete subscription, or just to put to be softly deleted.
      * @SEE delete method of based class
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    protected function allowDeleting($id)
+    protected function allowDeleting(int $id) : bool
     {
         // if we introduce new table order-article then we may just read that table, not reading json param in table
 

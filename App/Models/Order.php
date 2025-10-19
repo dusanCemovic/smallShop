@@ -3,12 +3,17 @@
 namespace App\Models;
 class Order extends BaseModel
 {
-    function getTable()
+    function getTable() : string
     {
         return "orders";
     }
 
-    public function createOrder($params) {
+    /**
+     * Creating order after everything is checked
+     * @param array $params
+     * @return array
+     */
+    public function createOrder(array $params) : array {
 
         $orderNumber = 'ORD-' . time() . '-' . rand(100, 999);
 
@@ -35,7 +40,7 @@ class Order extends BaseModel
      * Custom listing all orders
      * @return array
      */
-    public function listAll()
+    public function listAll() : array
     {
         $query = $this->pdo->prepare(
             "SELECT orders.*, customers.phone as phone FROM " . $this->getTable() . " 
@@ -46,11 +51,6 @@ class Order extends BaseModel
         $query->execute();
 
         return $query->fetchAll();
-    }
-
-    private function priceOfSubscriptionPackage()
-    {
-
     }
 }
 

@@ -19,7 +19,7 @@ class ArticlesController extends BaseController
      * @return void
      * @throws \Exception
      */
-    public function index()
+    public function index() : void
     {
         try {
             $articles = $this->model->all();
@@ -35,7 +35,7 @@ class ArticlesController extends BaseController
      * @return void
      * @throws \Exception
      */
-    public function delete()
+    public function delete() : void
     {
         try {
             $id = (int)$_POST['id'] ?? null;
@@ -52,7 +52,7 @@ class ArticlesController extends BaseController
      * @return void
      * @throws \Exception
      */
-    public function form($id = null)
+    public function form($id = null) : void
     {
         try {
             $params = [];
@@ -77,7 +77,7 @@ class ArticlesController extends BaseController
      * If it is edit, just use same method and send id
      * @return void
      */
-    public function editForm()
+    public function editForm() : void
     {
         $this->form((int) $_GET['id']);
     }
@@ -87,7 +87,7 @@ class ArticlesController extends BaseController
      * @return void
      * @throws \Exception
      */
-    public function create()
+    public function create() : void
     {
         $args = $this->cleanArguments();
         $errors = $this->checkForm($args);
@@ -101,7 +101,7 @@ class ArticlesController extends BaseController
                 return;
             }
 
-            $this->model->create($args);
+            $new_article = $this->model->create($args);
             $this->redirect('/?route=articles.index');
 
         } catch (\Exception $e) {
@@ -118,7 +118,7 @@ class ArticlesController extends BaseController
      * @return void
      * @throws \Exception
      */
-    public function update()
+    public function update() : void
     {
         $args = $this->cleanArguments();
         $errors = $this->checkForm($args);
@@ -149,7 +149,7 @@ class ArticlesController extends BaseController
      * New frameworks have more sofisticied validation
      * @return array
      */
-    private function cleanArguments()
+    private function cleanArguments() : array
     {
         $cleanedArgs['name'] = trim($_POST['name'] ?? '');
         $cleanedArgs['price'] = $_POST['price'] ?? null;
@@ -161,10 +161,10 @@ class ArticlesController extends BaseController
 
     /**
      * Return errors to view or allow to proceed
-     * @param $args
+     * @param array $args
      * @return array
      */
-    private function checkForm($args)
+    private function checkForm(array $args) : array
     {
         // this checking are just simple for now. We can extend this to have more details
 

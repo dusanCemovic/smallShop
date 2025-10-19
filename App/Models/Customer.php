@@ -3,7 +3,7 @@
 namespace App\Models;
 class Customer extends BaseModel
 {
-    function getTable()
+    function getTable() : string
     {
         return 'customers';
     }
@@ -11,31 +11,31 @@ class Customer extends BaseModel
     /**
      * Create user or return existing user
      *
-     * @param $phone
-     * @return false|mixed|string
+     * @param string $phone
+     * @return int
      * @throws \Exception
      */
-    public function createIfNotExists($phone)
+    public function createIfNotExists(string $phone) : int
     {
         $existing = $this->findByParam('phone', $phone);
 
         if ($existing) {
-            return $existing['id'];
+            return (int) $existing['id'];
         } else {
             $query = $this->pdo->prepare("INSERT INTO " . $this->getTable() . " (phone) VALUES (:phone)");
             $query->execute(['phone' => $phone]);
 
-            return $this->pdo->lastInsertId();
+            return (int) $this->pdo->lastInsertId();
         }
 
     }
 
     /**
      * Check if customer has subscription
-     * @param $customer_id
+     * @param int $customer_id
      * @return bool
      */
-    public function customerHasSubscription($customer_id)
+    public function customerHasSubscription(int $customer_id) : bool
     {
         // check if user already purchase some subscription package
         $subCheck = $this->pdo->prepare("SELECT COUNT(*) FROM orders WHERE customer_id = :cid AND subscription_package_id IS NOT NULL");
@@ -47,10 +47,10 @@ class Customer extends BaseModel
     /**
      * This is custom method for this class. Checking if we can delete customer, or just to put to be softly deleted.
      * @SEE delete method of based class
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    protected function allowDeleting($id)
+    protected function allowDeleting(int $id) : bool
     {
         // is there any order that this customer did
         $check = $this->pdo->prepare("SELECT COUNT(*) FROM orders WHERE customer_id = :id");

@@ -6,9 +6,11 @@ use App\Models\DB;
 
 class SMSManager
 {
-    protected $providers = [];
-    protected $cfg;
-    protected $pdo;
+    protected array $providers = [];
+    protected array $cfg;
+    protected \PDO $pdo;
+
+    public int $runtime = 1;
 
     protected $redis;
 
@@ -34,12 +36,12 @@ class SMSManager
 
     /**
      * Count logs in last minute for specific provider
-     * @param $providerName
+     * @param string $providerName
      * @return int
      */
-    protected function countSentInLastMinute($providerName) : int
+    protected function countSentInLastMinute(string $providerName) : int
     {
-        $query = $this->pdo->prepare("SELECT COUNT(*) FROM sms_logs WHERE provider = :p AND created_at >= (NOW() - INTERVAL 5 MINUTE)");
+        $query = $this->pdo->prepare("SELECT COUNT(*) FROM sms_logs WHERE provider = :p AND created_at >= (NOW() - INTERVAL " . $this->runtime  . " MINUTE)");
         $query->execute(['p' => $providerName]);
         return (int)$query->fetchColumn();
     }
@@ -102,14 +104,14 @@ class SMSManager
     }
 
     /**
-     * @param $provider
-     * @param $to
-     * @param $content
-     * @param $sendingStatus
+     * @param string $provider
+     * @param string $to
+     * @param string $content
+     * @param bool $sendingStatus
      * @param $errorMessage
      * @return void
      */
-    private function logSms($provider, $to, $content, $sendingStatus, $errorMessage = null): void
+    private function logSms(string $provider, string $to, string $content, bool $sendingStatus, $errorMessage = null): void
     {
 
         $query = $this->pdo->prepare("INSERT INTO sms_logs (provider, to_phone, content, success, error_message) 

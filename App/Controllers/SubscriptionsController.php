@@ -6,7 +6,7 @@ use App\Models\Subscription;
 
 class SubscriptionsController extends BaseController
 {
-    protected $model; // subscription model
+    protected Subscription $model; // subscription model
 
     public function __construct()
     {
@@ -19,7 +19,7 @@ class SubscriptionsController extends BaseController
      * @return void
      * @throws \Exception
      */
-    public function index()
+    public function index() : void
     {
         try {
             $packages = $this->model->all();
@@ -34,7 +34,7 @@ class SubscriptionsController extends BaseController
     /**
      * @return void
      */
-    public function delete()
+    public function delete() : void
     {
         try {
             $id = (int)$_POST['id'] ?? null;
@@ -51,7 +51,7 @@ class SubscriptionsController extends BaseController
      * We can only create subscriptions, not edit
      * @return void
      */
-    public function form()
+    public function form() : void
     {
         try {
             $this->render('subscriptions/form', []);
@@ -64,14 +64,14 @@ class SubscriptionsController extends BaseController
     /**
      * Create new Subscription submit
      */
-    public function create()
+    public function create() : void
     {
         $args = $this->cleanArguments();
         $errors = $this->checkForm($args);
 
         try {
             if (empty($errors)) {
-                $this->model->create($args);
+                $new_sub = $this->model->create($args);
                 $this->redirect('/?route=subscriptions.index');
             } else {
                 $this->render('subscriptions/form',
@@ -89,7 +89,7 @@ class SubscriptionsController extends BaseController
      * New frameworks have more sofisticied validation
      * @return array
      */
-    private function cleanArguments()
+    private function cleanArguments() : array
     {
         $cleanedArgs['name'] = trim($_POST['name'] ?? '');
         $cleanedArgs['price'] = $_POST['price'] ?? null;
@@ -101,10 +101,10 @@ class SubscriptionsController extends BaseController
 
     /**
      * Return errors to view or allow to proceed
-     * @param $args
+     * @param array $args
      * @return array
      */
-    private function checkForm($args)
+    private function checkForm(array $args) : array
     {
         // this checking are just simple for now. We can extend this to have more details
 

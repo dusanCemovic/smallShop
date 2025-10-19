@@ -3,7 +3,7 @@
 namespace App\Models;
 abstract class BaseModel
 {
-    protected $pdo;
+    protected \PDO $pdo;
 
     public function __construct()
     {
@@ -12,7 +12,7 @@ abstract class BaseModel
     }
 
     // every new class has to define name of table
-    abstract function getTable();
+    abstract function getTable() : string;
 
     /**
      * Font one based on id.
@@ -82,13 +82,16 @@ abstract class BaseModel
     /**
      * This is "soft" delete. So we set time of deleting.
      * If it is allowed to be deleted then we can delete it without problem
-     * @param $id
+     * @param int $id
      * @param bool $force in case to force delete without checking
      * @return bool
      * @throws \Exception
      */
-    public function delete($id, $force = false)
+    public function delete(int $id, bool $force = false) : bool
     {
+        if($id === 0) {
+            throw new \Exception("Error id === " . $id . " in table:  " . $this->getTable());
+        }
 
         if ($force || $this->allowDeleting($id)) {
             // total delete
@@ -112,10 +115,10 @@ abstract class BaseModel
 
     /**
      * This is different for each model. In case that some data is used in other tables, we will probably just soft delete.
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    protected function allowDeleting($id)
+    protected function allowDeleting(int $id) : bool
     {
         return true;
     }
@@ -125,7 +128,7 @@ abstract class BaseModel
      * In practice, probably due the private and terms we have to delete everything about customer except id
      * @return bool
      */
-    protected function customThingsToBeDone() {
+    protected function customThingsToBeDone() : bool {
         return true; // empty by default
     }
 

@@ -6,7 +6,7 @@ class DB
     private static $config; // config file
     private static $pdo; // database representation
 
-    public static function getConfig() {
+    public static function getConfig() : array {
         if (self::$config) {
             return self::$config;
         }

@@ -10,7 +10,7 @@ use App\Services\SMS\SMSManager;
 
 class OrdersController extends BaseController
 {
-    protected $model;
+    protected Order $model;
     private Customer $customerModel;
     private Subscription $subscriptionModel;
     private Article $articleModel;
@@ -28,7 +28,7 @@ class OrdersController extends BaseController
      * @return void
      * @throws \Exception
      */
-    public function index()
+    public function index() : void
     {
         try {
             $orders = $this->model->listAll();
@@ -40,12 +40,12 @@ class OrdersController extends BaseController
         }
     }
 
-    public function checkoutForm()
+    public function checkoutForm() : void
     {
         $this->render('orders/checkout', []);
     }
 
-    public function placeOrder()
+    public function placeOrder() : void
     {
         $args = $this->cleanArguments();
         $errors = $this->checkForm($args);
@@ -58,13 +58,13 @@ class OrdersController extends BaseController
             }
 
             $customer_id = $this->customerModel->createIfNotExists($args['phone']);
-            if ($customer_id === null) {
+            if ($customer_id === 0) {
                 throw new \Exception("Error while creating customer");
             }
 
-            $result = $this->initOrder($customer_id, $this->parseArticles($args['articles']), $args['subscription_id']);
+            $result = $this->initOrder($customer_id, $this->parseArticles($args['articles']), (int) $args['subscription_id']);
 
-            if(is_array($result) && !empty($result) && isset($result['id']) && (int) $result['id'] > 0 ) {
+            if(!empty($result) && isset($result['id']) && (int) $result['id'] > 0 ) {
                 // success
             } else {
                 throw new \Exception("Error while creating order");
@@ -92,7 +92,7 @@ class OrdersController extends BaseController
      * New frameworks have more sofisticied validation
      * @return array
      */
-    private function cleanArguments()
+    private function cleanArguments() : array
     {
 
         $cleanedArgs['phone'] = trim($_POST['phone'] ?? '');
@@ -107,7 +107,7 @@ class OrdersController extends BaseController
      * @param $args
      * @return array
      */
-    private function checkForm($args)
+    private function checkForm(array $args) : array
     {
         // this checking are just simple for now. We can extend this to have more details
 
@@ -127,18 +127,18 @@ class OrdersController extends BaseController
      * This method start and control order
      */
     /**
-     * @param mixed $customer_id
+     * @param int $customer_id
      * @param array $articles
-     * @param mixed $subscription_id
+     * @param int $subscription_id
      * @return array
      * @throws \Exception
      */
-    private function initOrder(mixed $customer_id, array $articles, mixed $subscription_id)
+    private function initOrder(int $customer_id, array $articles, int $subscription_id): array
     {
         $total = 0.0;
 
         // 1. adding subscription
-        if ($subscription_id) {
+        if ($subscription_id !== 0) {
 
             $SubscriptionPackage = $this->subscriptionModel->findOne($subscription_id);
 
@@ -189,7 +189,7 @@ class OrdersController extends BaseController
             'customer_id' => $customer_id,
             'total' => $total,
             'articles' => json_encode($cartArticles),
-            'subscription_package_id' => $subscription_id,
+            'subscription_package_id' => $subscription_id === 0 ? null : $subscription_id,
         ];
 
         // 3. execute
@@ -201,6 +201,7 @@ class OrdersController extends BaseController
     /**
      * Method which sends notification to customer
      * @param array $args
+     * @param array $result
      * @return void
      */
     private function sendMessage(array $args, array $result) : void
@@ -210,7 +211,6 @@ class OrdersController extends BaseController
             $smsManager->sendWithFailover($args['phone'], "Your order #" . $result['order_number'] . " was created.");
         } catch (\Exception $e) {
             $this->logError($e->getMessage());
-            exit();
             // if problem happen, we will continue with normal work, but will log this
         }
     }
@@ -221,7 +221,7 @@ class OrdersController extends BaseController
      * @param mixed $articles
      * @return array
      */
-    private function parseArticles(string $articles)
+    private function parseArticles(string $articles) : array
     {
         $result = [];
 

@@ -4,18 +4,18 @@ namespace App\Models;
 class Article extends BaseModel
 {
 
-    function getTable()
+    function getTable() : string
     {
         return 'articles';
     }
 
     /**
      * Create new article
-     * @param $data
-     * @return false|string
+     * @param array $data
+     * @return int
      * @throws \Exception
      */
-    public function create($data)
+    public function create(array $data) : int
     {
         $parseData = $this->parseData($data);
 
@@ -29,12 +29,12 @@ class Article extends BaseModel
 
     /**
      * Update article
-     * @param $id
-     * @param $data
+     * @param int $id
+     * @param array $data
      * @return bool
      * @throws \Exception
      */
-    public function update($id, $data)
+    public function update(int $id, array $data) : bool
     {
         $parseData = $this->parseData($data);
         $parseData['id'] = $id;
@@ -50,10 +50,10 @@ class Article extends BaseModel
     /**
      * This is custom method for this class. Checking if we can delete article, or just to put to be softly deleted.
      * @SEE delete method of based class
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    protected function allowDeleting($id)
+    protected function allowDeleting(int $id) : bool
     {
         // if we introduce new table order-article then we may just read that table, not reading json param in table
 
@@ -67,10 +67,10 @@ class Article extends BaseModel
 
     /**
      * Parse data for creating or updating
-     * @param $data
+     * @param array $data
      * @return array
      */
-    private function parseData($data)
+    private function parseData(array $data): array
     {
         return [
             'name' => $data['name'],
