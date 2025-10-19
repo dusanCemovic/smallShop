@@ -13,6 +13,7 @@ class Customer extends BaseModel
      *
      * @param $phone
      * @return false|mixed|string
+     * @throws \Exception
      */
     public function createIfNotExists($phone)
     {
@@ -27,6 +28,20 @@ class Customer extends BaseModel
             return $this->pdo->lastInsertId();
         }
 
+    }
+
+    /**
+     * Check if customer has subscription
+     * @param $customer_id
+     * @return bool
+     */
+    public function customerHasSubscription($customer_id)
+    {
+        // check if user already purchase some subscription package
+        $subCheck = $this->pdo->prepare("SELECT COUNT(*) FROM orders WHERE customer_id = :cid AND subscription_package_id IS NOT NULL");
+        $subCheck->execute(['cid' => $customer_id]);
+
+        return (int)$subCheck->fetchColumn() > 0;
     }
 
     /**

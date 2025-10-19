@@ -30,6 +30,8 @@ abstract class BaseController
     }
 
     protected function logError($message) {
+        print $message;
+        exit();
         // this can be added into log file
     }
 }

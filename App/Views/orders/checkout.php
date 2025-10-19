@@ -12,9 +12,7 @@
 
         <div>
             <label for="articles">Articles (Example: 1,2,3)</label>
-            <textarea id="articles" name="articles" rows="6"
-                      cols="20"><?php echo htmlspecialchars(is_array($old['articles']) ? json_encode($old['articles']) : ($old['articles'] ?? '')) ?>
-            </textarea>
+            <textarea id="articles" name="articles" rows="6" cols="20"><?php echo htmlspecialchars(is_array($old['articles']) ? json_encode($old['articles']) : ($old['articles'] ?? '')) ?></textarea>
         </div>
         <div>
             <label for="subscription_id">

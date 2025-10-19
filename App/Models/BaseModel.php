@@ -40,6 +40,10 @@ abstract class BaseModel
      */
     public function findByParam($paramName, $paramValue, $limit = 1, $deletedInclude = false)
     {
+        if (!$paramName || !$paramValue) {
+            throw new \Exception("Wrong parameter name or parameter value ");
+        }
+
         try {
             $limitLabel = $limit !== -1 ? ' LIMIT ' . $limit : '';
             $deletedIncludeLabel = $deletedInclude === false ? ' and deleted_at IS NULL' : ' and deleted_at IS NOT NULL ';
@@ -80,29 +84,22 @@ abstract class BaseModel
      */
     public function delete($id, $force = false)
     {
-        try {
 
-            if ($force || $this->allowDeleting($id)) {
-                // total delete
-                $query = $this->pdo->prepare("DELETE FROM " . $this->getTable() . " WHERE id = :id");
-            } else {
-                // soft delete
-                $query = $this->pdo->prepare("UPDATE " . $this->getTable() . " SET deleted_at = NOW() WHERE id = :id");
-            }
+        if ($force || $this->allowDeleting($id)) {
+            // total delete
+            $query = $this->pdo->prepare("DELETE FROM " . $this->getTable() . " WHERE id = :id");
+        } else {
+            // soft delete
+            $query = $this->pdo->prepare("UPDATE " . $this->getTable() . " SET deleted_at = NOW() WHERE id = :id");
+        }
 
-            if (!$query->execute(['id' => $id])) {
-                throw new \Exception("Error deleting row id: " . $id . " in table:  " . $this->getTable());
-            };
+        if (!$query->execute(['id' => $id])) {
+            throw new \Exception("Error deleting row id: " . $id . " in table:  " . $this->getTable());
+        };
 
-            // each model can create additionally things for DB
-            if(!$this->customThingsToBeDone()) {
-                throw new \Exception("Error with custom thing which need to be deleted, row id: " . $id . " in table:  " . $this->getTable());
-            }
-
-
-        } catch (\PDOException $e) {
-            // todo we can put in log or we just send. It is valid that $id doesn't exist
-            return false;
+        // each model can create additionally things for DB
+        if(!$this->customThingsToBeDone()) {
+            throw new \Exception("Error with custom thing which need to be deleted, row id: " . $id . " in table:  " . $this->getTable());
         }
 
         return true;

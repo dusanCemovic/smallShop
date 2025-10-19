@@ -34,6 +34,7 @@ PHP application implementing:
   - Important are methods
     - render - is default method which can be overwritten 
     - logError - which get all error thrown from exceptions so we may handle globally
+  - Main Controller method is place older which connect everything
 - VIEW (APP/Views): main view element is layout.php with header, and each view is loaded inside that one
 - DB (migration/db.sql):
   - In task, was given that each person is unique by phone number, but i put in separate table so we can delete person (delete phone number) but leave as id if it has history in order, soft delete.
