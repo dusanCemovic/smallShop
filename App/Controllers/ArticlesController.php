@@ -14,6 +14,10 @@ class ArticlesController extends BaseController
         $this->model = new Article();
     }
 
+    public function notfound() : void {
+        $this->render('404');
+    }
+
     /**
      * Load all articles
      * @return void

@@ -17,14 +17,16 @@ $route[1] = $route[1] ?? 'index';
 // checking if class exists
 $controllerClass = '\\App\\Controllers\\' . ucfirst($route[0]) . 'Controller';
 if (!class_exists($controllerClass)) {
-    echo "Controller " . $controllerClass . " not found";
+    //echo "Controller " . $controllerClass . " not found";
+    header('Location: ' . '/?route=articles.notfound'); // or we may redirect always to 404
     exit;
 }
 
 // checking if method exists
 $controller = new $controllerClass();
 if (!method_exists($controller, $route[1])) {
-    echo "Method " . $route[1] . " not found";
+    //echo "Method " . $route[1] . " not found";
+    header('Location: ' . '/?route=articles.notfound'); // or we may redirect always to 404
     exit;
 }
 
