@@ -71,6 +71,8 @@ class OrdersController extends BaseController
 
         } catch (\Exception $e) {
             // show customer error
+            // I sent all exceptions and error to frontend, but we can do this differently to show only some messages, but other ones to sent to Database for admin check
+
             $errors['error'] = $e->getMessage();
             $this->render('orders/checkout',
                 ['errors' => $errors, 'old' => $args]);

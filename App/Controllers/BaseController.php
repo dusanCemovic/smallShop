@@ -29,10 +29,15 @@ abstract class BaseController
         exit;
     }
 
+    /** This is used for every exception which is made in App.
+     *  We can choose if we want to put in DB or just print and exit.
+     * @param $message
+     * @return void
+     */
     protected function logError($message) {
-        print $message;
-        exit();
         // this can be added into log file
+        // print $message;
+        // exit();
     }
 }
 
