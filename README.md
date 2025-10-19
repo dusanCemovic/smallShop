@@ -41,6 +41,10 @@ PHP application implementing:
   - each table has deleted_at, to allow this soft delete
 - ROUTER (index.php): It is done in /index.php file. We allow autoload like in any new framework or environment
   - Due to the simplicity, every route is via _GET param and then parsed
+- SMS - SERVICES (ServicesSMS)
+  - Everything is controlled by Manager. Interface is used for both providers which has only pseudocode
+  - THIS CAN BE OPTIMIZED using redis or some other server addons to avoid calling db for checking how many sms are sent in last 1 minutes
+  - Also, writting each log in database can be done via cronjob to also avoid writing in db for each sms
 - OTHER:
   - Config file with credentials and other info is added in config file. In practice, we can also use env file.
 
