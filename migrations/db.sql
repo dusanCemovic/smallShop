@@ -40,4 +40,13 @@ CREATE TABLE IF NOT EXISTS orders (
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
     FOREIGN KEY (subscription_package_id) REFERENCES subscription_packages(id) ON DELETE SET NULL
 );
+CREATE TABLE IF NOT EXISTS sms_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    provider VARCHAR(50) NOT NULL,
+    to_phone VARCHAR(30) NOT NULL,
+    content TEXT NOT NULL,
+    success TINYINT(1) NOT NULL,
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 

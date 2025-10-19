@@ -62,9 +62,16 @@ class OrdersController extends BaseController
                 throw new \Exception("Error while creating customer");
             }
 
-            $result = $this->initOrder($customer_id, explode(',', $_POST['articles']), $args['subscription_id']);
+            $result = $this->initOrder($customer_id, $this->parseArticles($args['articles']), $args['subscription_id']);
 
-            // todo Attempt to send SMS
+            if(is_array($result) && !empty($result) && isset($result['id']) && (int) $result['id'] > 0 ) {
+                // success
+            } else {
+                throw new \Exception("Error while creating order");
+            }
+
+            // send notification to customer
+            $this->sendMessage($args, $result);
 
             $this->redirect('/?route=orders.index');
 
@@ -189,6 +196,44 @@ class OrdersController extends BaseController
         return $this->model->createOrder($data);
 
 
+    }
+
+    /**
+     * Method which sends notification to customer
+     * @param array $args
+     * @return void
+     */
+    private function sendMessage(array $args, array $result) : void
+    {
+        $smsManager = new SMSManager();
+        try {
+            $smsManager->sendWithFailover($args['phone'], "Your order #" . $result['order_number'] . " was created.");
+        } catch (\Exception $e) {
+            $this->logError($e->getMessage());
+            exit();
+            // if problem happen, we will continue with normal work, but will log this
+        }
+    }
+
+    /**
+     * This is used for parsing articles from cart
+     * Here is just simple text area
+     * @param mixed $articles
+     * @return array
+     */
+    private function parseArticles(string $articles)
+    {
+        $result = [];
+
+        $array = explode(',', $articles);
+        foreach ($array as $item) {
+            if(trim($item) === '') {
+                continue;
+            }
+            $result[] = trim($item);
+        }
+
+        return $result;
     }
 }
 

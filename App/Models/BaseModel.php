@@ -7,6 +7,7 @@ abstract class BaseModel
 
     public function __construct()
     {
+        $this->cfg = DB::getConfig();
         $this->pdo = DB::getConnection();
     }
 
@@ -24,9 +25,13 @@ abstract class BaseModel
             $table = $this->getTable();
         }
 
-        $query = $this->pdo->prepare("SELECT * FROM " . $table . " WHERE id = " . $id . " LIMIT 1");
-        $query->execute();
-        return $query->fetch();
+        try {
+            $query = $this->pdo->prepare("SELECT * FROM " . $table . " WHERE id = " . $id . " LIMIT 1");
+            $query->execute();
+            return $query->fetch();
+        } catch (\PDOException $e) {
+            throw new \Exception("FindOne made problem, value: >>'" . $id . "'<< // " . $e->getMessage());
+        }
     }
 
     /**

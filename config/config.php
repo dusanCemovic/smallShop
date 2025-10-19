@@ -10,5 +10,6 @@ return [
         ],
     ],
     'app' => ['base_url' => '/'],
+    'sms' => ['primary' => 'provider_a', 'providers' => ['provider_a' => [], 'provider_b' => []]]
 ];
 
