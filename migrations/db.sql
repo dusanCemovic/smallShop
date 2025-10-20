@@ -1,4 +1,4 @@
-DROP DATABASE creatim;
+DROP DATABASE IF EXISTS creatim;
 CREATE DATABASE IF NOT EXISTS creatim CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE creatim;
 

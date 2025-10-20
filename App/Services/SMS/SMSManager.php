@@ -51,7 +51,8 @@ class SMSManager
      */
     protected function addToCache(string $providerName): void
     {
-       // this is now empty, but can be used together with @see countSentInLastMinute to check number of sms logs
+        // with this method we can optimize sending SMS, but we need to use redis or something else
+        // this is now empty, but can be used together with @see countSentInLastMinute to check the number of sms logs
     }
 
     public function sendWithFailover(string $to, string $content) : bool
@@ -62,7 +63,7 @@ class SMSManager
         $primary = $this->cfg['primary'] ?? 'provider_a';
         $providersOrder[] = $this->providers[$primary];
 
-        // then add others, or we can set secondary, third etc.
+        // then add others, or we can set secondary, third, etc.
         foreach ($this->providers as $name => $provService) {
             if ($name !== $primary) {
                 $providersOrder[] = $provService;
@@ -76,7 +77,7 @@ class SMSManager
             $count = $this->countSentInLastMinute($name);
 
             if ($count >= 5) {
-                // we already reach, try other provider
+                // we already reach, try another provider
                 continue;
             }
 
@@ -89,11 +90,11 @@ class SMSManager
                 $this->addToCache($name);
 
                 if ($sendingStatus) {
-                    return true; // return only if it is successful. If it is failed, anyway put in log
+                    return true; // return only if it is successful. If it is failed, anyway put in the log
                 }
 
             } catch (\Exception $e) {
-                // in case of error, put in log file
+                // in case of error, put in the log file
                 $this->logSms($name, $to, $content, false, $e->getMessage());
                 continue;
             }

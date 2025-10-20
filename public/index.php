@@ -1,8 +1,5 @@
 <?php
 
-// loading database (PDO)
-require_once __DIR__ . '/../App/Models/DB.php';
-
 // this is simple autoloader
 spl_autoload_register(function ($class) {
     $path = __DIR__ . '/../' . str_replace('\\', '/', $class) . '.php';

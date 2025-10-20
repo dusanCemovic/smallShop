@@ -52,15 +52,14 @@ class ArticlesController extends BaseController
     }
 
     /** This is for creating and editing/updating
-     * @param $id
+     * @param int $id
      * @return void
-     * @throws \Exception
      */
-    public function form($id = null) : void
+    public function form(int $id = 0) : void
     {
         try {
             $params = [];
-            if ($id === null) {
+            if ($id === 0) {
                 $params['action'] = 'create';
             } else {
                 $params['action'] = 'update';
@@ -87,7 +86,7 @@ class ArticlesController extends BaseController
     }
 
     /**
-     * Create new Article submit
+     * Create a new Article submit
      * @return void
      * @throws \Exception
      */
@@ -98,7 +97,7 @@ class ArticlesController extends BaseController
 
         try {
 
-            // check if frontend errors occur, or continue
+            // check if frontend errors occur or continue
             if (!empty($errors)) {
                 $this->render('articles/form',
                     ['action' => 'create', 'errors' => $errors, 'old' => $args]);

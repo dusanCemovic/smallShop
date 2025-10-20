@@ -4,6 +4,7 @@ namespace App\Models;
 abstract class BaseModel
 {
     protected \PDO $pdo;
+    protected array $cfg;
 
     public function __construct()
     {
@@ -38,12 +39,12 @@ abstract class BaseModel
      * Find specific row(s) based on param and its value
      * @param $paramName
      * @param $paramValue
-     * @param $limit
+     * @param $limit this can be string or integer
      * @param bool $deletedInclude
      * @return mixed
      * @throws \Exception
      */
-    public function findByParam($paramName, $paramValue, $limit = 1, $deletedInclude = false)
+    public function findByParam(string $paramName, $paramValue, int $limit = 1, $deletedInclude = false)
     {
         if (!$paramName || !$paramValue) {
             throw new \Exception("Wrong parameter name or parameter value ");
@@ -71,9 +72,9 @@ abstract class BaseModel
 
     /**
      * Find all rows by date of creating
-     * @return array
+     * @return mixed
      */
-    public function all()
+    public function all() : mixed
     {
         $query = $this->pdo->query("SELECT * FROM " . $this->getTable() . " WHERE deleted_at IS NULL ORDER BY created_at DESC");
         return $query->fetchAll();

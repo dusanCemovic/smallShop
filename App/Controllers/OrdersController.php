@@ -62,6 +62,7 @@ class OrdersController extends BaseController
                 throw new \Exception("Error while creating customer");
             }
 
+            // 1. create order
             $result = $this->initOrder($customer_id, $this->parseArticles($args['articles']), (int) $args['subscription_id']);
 
             if(!empty($result) && isset($result['id']) && (int) $result['id'] > 0 ) {
@@ -70,7 +71,7 @@ class OrdersController extends BaseController
                 throw new \Exception("Error while creating order");
             }
 
-            // send notification to customer
+            // 2. send notification to the customer
             $this->sendMessage($args, $result);
 
             $this->redirect('/?route=orders.index');
@@ -113,8 +114,9 @@ class OrdersController extends BaseController
 
         $errors = [];
 
-        if ($args['phone'] === '') {
-            $errors[] = 'Phone required';
+        if ($args['phone'] === '' || !is_numeric($args['phone'])) {
+            // we can add better validation for phone
+            $errors[] = 'Phone required, and to be valid';
         }
         if (empty($args['articles']) && !$args['subscription_id']) {
             $errors[] = 'Select at least an article or a subscription';
@@ -150,7 +152,7 @@ class OrdersController extends BaseController
                 throw new \Exception("You already have a subscription package.");
             };
 
-            $total += $SubscriptionPackage['price'];
+            $total += (float) $SubscriptionPackage['price'];
         }
 
         $cartArticles = [];
@@ -158,7 +160,7 @@ class OrdersController extends BaseController
         // 2.adding articles
         if (!empty($articles)) {
 
-            // We first put all articles in array and then call one time query to avoid n*2 complexity with queries.
+            // We first put all articles in array and then call one time query to avoid n*2 COMPLEXITY with queries.
             // This solution is faster even that it is also n*2 complexity, but it is using only side not calling mysql.
             foreach ($articles as $article) {
                 $Article = $this->articleModel->findOne($article);

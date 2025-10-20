@@ -62,7 +62,7 @@ class SubscriptionsController extends BaseController
     }
 
     /**
-     * Create new Subscription submit
+     * Create a new Subscription submit
      */
     public function create() : void
     {
