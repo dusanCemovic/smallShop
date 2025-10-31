@@ -1,4 +1,4 @@
-# CREATIM PHP Shop
+# Small PHP Shop
 PHP application implementing:
 - Articles
 - Subscription packages
